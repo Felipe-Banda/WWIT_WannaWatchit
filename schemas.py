@@ -9,7 +9,7 @@ class Obra(BaseModel):
     nota: float
     ativo: bool = True
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes = True)
 
 class ObraStatus(BaseModel):
     ativo: bool
@@ -23,3 +23,5 @@ class ObraUpdate(BaseModel):
 class ObraSearch(BaseModel):
     id: int
     titulo: str
+
+    model_config = ConfigDict(from_attributes = True)
