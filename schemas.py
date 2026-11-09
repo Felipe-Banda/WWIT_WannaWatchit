@@ -25,3 +25,12 @@ class ObraSearch(BaseModel):
     titulo: str
 
     model_config = ConfigDict(from_attributes = True)
+
+# --- AUTENTICAÇÃO E USUÁRIO --- #
+class NewUser(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

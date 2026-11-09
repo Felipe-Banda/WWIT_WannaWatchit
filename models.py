@@ -10,3 +10,10 @@ class Obra(Base):
      autor = Column(String(100), nullable = False)
      nota = Column(Float, nullable = False)
      ativo = Column(Boolean, default = True)
+
+class User(Base):
+     __tablename__ = 'users'
+
+     id = Column(Integer, primary_key = True, index = True)
+     username = Column(String(50), unique = True, index = True, nullable = False)
+     password = Column(String(255), nullable = False)
