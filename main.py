@@ -115,7 +115,7 @@ def obra_search(titulo: Optional[str] = None, db: Session = Depends(get_db)):
 
 @app.get('/obras/{id}', response_model = Obra)
 def obra_id_find(id: int, db: Session = Depends(get_db)):
-    obra = db.query(models.Obra).filter(models.Obra.id == id, models.Obra.ativo == True).first()
+    obra = db.query(models.Obra).filter(models.Obra.id == id).first()
     if not obra:
         raise HTTPException(status_code=404, detail=f'Nenhum resultado encontrado para o id: {id}.')
     return obra
