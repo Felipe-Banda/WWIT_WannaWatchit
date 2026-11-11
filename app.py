@@ -45,21 +45,25 @@ def modal_login():
 # --- 3. BARRA DE NAVEGAÇÃO SUPERIOR ---
 col1, col2, col3 = st.columns([1, 2, 1], vertical_alignment="center")
 with col1:
-    if st.button("🏠︎ WWIT", use_container_width=True):
+    if st.button("WWIT 🏠︎", type="tertiary"):
         navigate_to('home')
 with col2:
     st.markdown("<h3 style='text-align: center; margin: 0;'>Wanna Watchit</h3>", unsafe_allow_html=True)
 with col3:
-    if st.session_state.token:
-        # Se estiver logado, exibe botão de Sair
-        if st.button(f"Sair ({st.session_state.username})", use_container_width=True):
-            st.session_state.token = None
-            st.session_state.username = None
-            navigate_to('home')
-    else:
-        # Se for visitante, exibe botão de Login
-        if st.button("Login", use_container_width=True):
-            modal_login()
+    # Subdivisão: a primeira coluna fica vazia (empurrando), a segunda recebe o botão
+    espacador, col_botao = st.columns([1, 1.5])
+    
+    with col_botao:
+        if st.session_state.token:
+            # Se estiver logado, exibe botão de Sair
+            if st.button(f"Sair", use_container_width=True):
+                st.session_state.token = None
+                st.session_state.username = None
+                navigate_to('home')
+        else:
+            # Se for visitante, exibe botão de Login
+            if st.button("Login", type="primary", use_container_width=True):
+                modal_login()
 
 st.divider()
 
@@ -72,23 +76,30 @@ if st.session_state.page == 'home':
     # Campo de busca
     busca = st.text_input("Busca", placeholder="Exemplo: Interestelar", label_visibility="collapsed")
     
-    # Botões de Ação
-    # Se o admin estiver logado, criamos 3 colunas. Se não, 2 colunas.
+    # Botões de Ação (Ajustados)
     if st.session_state.token:
-        b1, b2, b3 = st.columns(3)
+        # 5 colunas: as das pontas servem como margem invisível para centralizar os botões
+        _, b1, b2, b3, _ = st.columns([1, 1, 1, 1, 1])
+        
+        with b1:
+            if st.button("🔍 Buscar"):
+                st.info("A conexão com a rota /obras/buscar será feita na próxima etapa!")
+        with b2:
+            if st.button("Lista Completa"):
+                st.info("A conexão com a rota /obras será feita na próxima etapa!")
         with b3:
-            if st.button("Restrito", type="primary", use_container_width=True):
+            if st.button("Restrito", type="primary"):
                 navigate_to('admin')
     else:
-        # Colunas com espaçadores laterais para centralizar os 2 botões
-        _, b1, b2, _ = st.columns([1, 2, 2, 1])
+        # Mesma lógica, mas para apenas 2 botões
+        _, b1, b2, _ = st.columns([1.5, 1, 1, 1.5])
         
-    with b1:
-        if st.button("🔍 Buscar", use_container_width=True):
-            st.info("A conexão com a rota /obras/buscar será feita na próxima etapa!")
-    with b2:
-        if st.button("Lista Completa", use_container_width=True):
-            st.info("A conexão com a rota /obras será feita na próxima etapa!")
+        with b1:
+            if st.button("🔍 Buscar"):
+                st.info("A conexão com a rota /obras/buscar será feita na próxima etapa!")
+        with b2:
+            if st.button("Lista Completa"):
+                st.info("A conexão com a rota /obras será feita na próxima etapa!")
 
 elif st.session_state.page == 'admin':
     # --- TELA RESTRITA (CRUD) ---
