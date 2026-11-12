@@ -16,6 +16,10 @@ if 'token' not in st.session_state:
     st.session_state.token = None
 if 'username' not in st.session_state:
     st.session_state.username = None
+if 'edit_id' not in st.session_state:
+    st.session_state.edit_id = None
+if 'form_data' not in st.session_state:
+    st.session_state.form_data = {"titulo": "", "sinopse": "", "autor": "", "nota": 0.0}
 
 def navigate_to(page_name):
     """Função para trocar a tela atual e recarregar a interface."""
@@ -178,10 +182,30 @@ elif st.session_state.page == 'resultados':
                         c_edit, c_status = st.columns(2)
                         with c_edit:
                             if st.button("Editar", key=f"edit_{id_obra}", use_container_width=True):
-                                st.info("Integração de edição no próximo passo!")
+                                st.session_state.edit_id = id_obra
+                                st.session_state.form_data = {
+                                    "titulo": obra_completa.get("titulo", ""),
+                                    "sinopse": obra_completa.get("sinopse", ""),
+                                    "autor": obra_completa.get("autor", ""),
+                                    "nota": obra_completa.get("nota", 0.0)
+                                }
+                                navigate_to('admin')
                         with c_status:
-                            if st.button("Status", key=f"status_{id_obra}", use_container_width=True):
-                                st.info("Integração de inativação no próximo passo!")
+                            label_status = 'Ativar' if not obra_completa.get('ativo') else 'Inativar'
+                            
+                            if st.button(label_status, key=f"status_{id_obra}", use_container_width=True):
+                                headers = {'Authorization': f'Bearer {st.session_state.token}'}
+                                novo_status = not obra_completa.get('ativo')
+                                
+                                # Consome a rota PUT de status
+                                res = requests.put(f"{API_URL}/admin/obras/{id_obra}/status", json={"ativo": novo_status}, headers=headers)
+                                
+                                if res.status_code == 200:
+                                    st.toast(f"Status atualizado com sucesso!")
+                                    st.rerun()
+                                else:
+                                    # Isso vai fazer o erro da API aparecer em vermelho na tela do app!
+                                    st.error(f"Erro {res.status_code}: {res.text}")
 
 elif st.session_state.page == 'admin':
     # --- TELA RESTRITA (CRUD) ---
@@ -190,7 +214,65 @@ elif st.session_state.page == 'admin':
         if st.button("Voltar"):
             navigate_to('home')
     else:
-        st.subheader("Painel Administrativo")
-        st.info("Formulários de CRUD serão construídos na próxima etapa.")
-        if st.button("Página Inicial"):
-            navigate_to('home')
+        # Define o título da tela baseado na ação
+        modo = "✏️ Editar Obra" if st.session_state.edit_id else "➕ Cadastrar Nova Obra"
+        st.markdown(f"<h4 style='text-align: center;'>{modo}</h4>", unsafe_allow_html=True)
+        st.divider()
+        
+        # Formulário preenchido com o state (vazio para novo, preenchido para edição)
+        col_form1, col_form2 = st.columns([2, 1])
+        with col_form1:
+            titulo = st.text_input("Título", value=st.session_state.form_data["titulo"])
+            autor = st.text_input("Autor(a)", value=st.session_state.form_data["autor"])
+        with col_form2:
+            nota = st.number_input("Nota (0 a 10)", min_value=0.0, max_value=10.0, step=0.1, value=float(st.session_state.form_data["nota"]))
+            
+        sinopse = st.text_area("Sinopse", value=st.session_state.form_data["sinopse"], height=150)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Botões de Ação do Formulário
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            if st.button("Limpar", use_container_width=True):
+                st.session_state.form_data = {"titulo": "", "sinopse": "", "autor": "", "nota": 0.0}
+                st.rerun()
+                
+        with c2:
+            if st.button("Finalizar", type="primary", use_container_width=True):
+                if not titulo:
+                    st.warning("O campo Título é obrigatório!")
+                else:
+                    headers = {"Authorization": f"Bearer {st.session_state.token}"}
+                    payload = {"titulo": titulo, "autor": autor, "nota": nota, "sinopse": sinopse}
+                    
+                    if st.session_state.edit_id:
+                        # Rota PUT (Atualizar)
+                        res = requests.put(f"{API_URL}/admin/obras/{st.session_state.edit_id}", json=payload, headers=headers)
+                        msg_sucesso = "Obra atualizada com sucesso!"
+                    else:
+                        # Rota POST (Criar Nova)
+                        res = requests.post(f"{API_URL}/admin/obras", json=payload, headers=headers)
+                        msg_sucesso = "Obra cadastrada com sucesso!"
+                        
+                    if res.status_code in [200, 201]:
+                        st.success(msg_sucesso)
+                        # Zera o formulário após sucesso
+                        st.session_state.edit_id = None
+                        st.session_state.form_data = {"titulo": "", "sinopse": "", "autor": "", "nota": 0.0}
+                    else:
+                        st.error(f"Erro na operação: {res.json().get('detail', 'Erro desconhecido')}")
+                        
+        with c3:
+            # Substituímos o "Página Inicial" por "Cancelar"
+            if st.button("Cancelar", use_container_width=True):
+                # Descobre qual era a página anterior com base na ação
+                pagina_anterior = 'resultados' if st.session_state.edit_id else 'home'
+                
+                # Limpa o state para não vazar dados
+                st.session_state.edit_id = None
+                st.session_state.form_data = {"titulo": "", "sinopse": "", "autor": "", "nota": 0.0}
+                
+                # Retorna para o local correto
+                navigate_to(pagina_anterior)
