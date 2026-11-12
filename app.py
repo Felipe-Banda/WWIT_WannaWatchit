@@ -8,6 +8,8 @@ st.set_page_config(page_title="WWIT - Wanna Watchit", layout="centered")
 API_URL = "http://127.0.0.1:8000"
 
 # --- 1. GERENCIAMENTO DE ESTADO (SPA) ---
+if 'from_key' not in st.session_state:
+    st.session_state.form_key = 0
 if 'resultados' not in st.session_state:
     st.session_state.resultados = []
 if 'page' not in st.session_state:
@@ -84,12 +86,14 @@ if st.session_state.page == 'home':
     
     # Botões de Ação
     if st.session_state.token:
-        # VISÃO ADMIN (3 botões)
-        _, b1, b2, b3, _ = st.columns([1, 1, 1, 1, 1])
+        # VISÃO ADMIN (2 Linhas)
         headers = {"Authorization": f"Bearer {st.session_state.token}"}
         
+        # --- LINHA 1: Buscas (Igual ao visitante) ---
+        _, b1, b2, _ = st.columns([1.5, 1, 1, 1.5])
+        
         with b1:
-            if st.button("🔍 Buscar"):
+            if st.button("🔍 Buscar", use_container_width=True):
                 if busca:
                     resposta = requests.get(f"{API_URL}/admin/obras/buscar", params={"titulo": busca}, headers=headers)
                     if resposta.status_code == 200:
@@ -100,15 +104,19 @@ if st.session_state.page == 'home':
                 else:
                     st.warning("Digite um termo para buscar.")
         with b2:
-            if st.button("Lista Completa"):
+            if st.button("Lista Completa", use_container_width=True):
                 resposta = requests.get(f"{API_URL}/admin/obras", headers=headers)
                 if resposta.status_code == 200:
                     st.session_state.resultados = resposta.json()
                     navigate_to('resultados')
                 else:
                     st.error("Falha ao carregar as obras. Verifique se a API está rodando.")
-        with b3:
-            if st.button("Restrito", type="primary"):
+                    
+        # --- LINHA 2: Cadastro (Largura somada de b1 + b2) ---
+        _, b_cad, _ = st.columns([1.5, 2, 1.5])
+        
+        with b_cad:
+            if st.button("Cadastrar", type="primary", use_container_width=True):
                 navigate_to('admin')
     else:
         # VISÃO VISITANTE (2 botões, mesma lógica de API)
@@ -147,11 +155,12 @@ elif st.session_state.page == 'resultados':
     if not st.session_state.resultados:
         st.info("Nenhum resultado para exibir.")
     else:
+        resultados_ordenados = sorted(st.session_state.resultados, key = lambda x: x['titulo'].lower())
         # Cria a estrutura de grade (3 colunas)
         colunas = st.columns(3)
         
         # Itera sobre os resultados distribuindo-os nas colunas
-        for index, obra_resumo in enumerate(st.session_state.resultados):
+        for index, obra_resumo in enumerate(resultados_ordenados):
             col_atual = colunas[index % 3] # Distribui 0, 1, 2, 0, 1, 2...
             
             with col_atual:
@@ -222,12 +231,12 @@ elif st.session_state.page == 'admin':
         # Formulário preenchido com o state (vazio para novo, preenchido para edição)
         col_form1, col_form2 = st.columns([2, 1])
         with col_form1:
-            titulo = st.text_input("Título", value=st.session_state.form_data["titulo"])
-            autor = st.text_input("Autor(a)", value=st.session_state.form_data["autor"])
+            titulo = st.text_input("Título", value=st.session_state.form_data["titulo"], key = f't_{st.session_state.form_key}')
+            autor = st.text_input("Autor(a)", value=st.session_state.form_data["autor"], key = f'a_{st.session_state.form_key}')
         with col_form2:
-            nota = st.number_input("Nota (0 a 10)", min_value=0.0, max_value=10.0, step=0.1, value=float(st.session_state.form_data["nota"]))
+            nota = st.number_input("Nota (0 a 10)", min_value=0.0, max_value=10.0, step=0.1, value=float(st.session_state.form_data["nota"]), key = f'n_{st.session_state.form_key}')
             
-        sinopse = st.text_area("Sinopse", value=st.session_state.form_data["sinopse"], height=150)
+        sinopse = st.text_area("Sinopse", value=st.session_state.form_data["sinopse"], height=150, key = f's_{st.session_state.form_key}')
         
         st.markdown("<br>", unsafe_allow_html=True)
         
@@ -257,10 +266,13 @@ elif st.session_state.page == 'admin':
                         msg_sucesso = "Obra cadastrada com sucesso!"
                         
                     if res.status_code in [200, 201]:
-                        st.success(msg_sucesso)
+                        # Usamos toast para a mensagem sobreviver ao recarregamento
+                        st.toast(msg_sucesso)
                         # Zera o formulário após sucesso
                         st.session_state.edit_id = None
                         st.session_state.form_data = {"titulo": "", "sinopse": "", "autor": "", "nota": 0.0}
+                        # Força a atualização da interface para esvaziar os campos visuais
+                        navigate_to('home')
                     else:
                         st.error(f"Erro na operação: {res.json().get('detail', 'Erro desconhecido')}")
                         
