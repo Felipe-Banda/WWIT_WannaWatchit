@@ -1,11 +1,12 @@
 import streamlit as st
 import requests
+import os
 
 # Configuração Base da Página
 st.set_page_config(page_title="WWIT - Wanna Watchit", layout="centered")
 
 # URL da nossa API FastAPI
-API_URL = "http://127.0.0.1:8000"
+API_URL = os.getenv('API_URL', 'http://127.0.0.1:8000')
 
 # --- 1. GERENCIAMENTO DE ESTADO (SPA) ---
 if 'from_key' not in st.session_state:
