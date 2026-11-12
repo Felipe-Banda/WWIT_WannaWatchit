@@ -288,3 +288,15 @@ elif st.session_state.page == 'admin':
                 
                 # Retorna para o local correto
                 navigate_to(pagina_anterior)
+
+# --- 5. RODAPÉ ---
+st.markdown("<br><br>", unsafe_allow_html=True) # Espaçamento para empurrar o rodapé para baixo
+st.markdown(
+    """
+    <div style='text-align: center; color: #888888; font-size: 0.9em;'>
+        Desenvolvido por <a href='https://www.linkedin.com/in/felipe-banda' target='_blank' style='color: #bbbbbb; text-decoration: none; font-weight: bold;'>Felipe Banda</a> <br>
+        <em>Wanna Watchit © 2026</em>
+    </div>
+    """, 
+    unsafe_allow_html=True
+)
