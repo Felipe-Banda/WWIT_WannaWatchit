@@ -60,8 +60,9 @@ cd WWIT_WannaWatchit
 ```bash
 dockercompose up -d --build
 ```
-```bash
+
 4. Acesse a aplicação no seu navegador:
+```bash
 * Frontend (Interface): http://localhost:8501
 * Backend (Documentação): http://localhost:8000/docs
 ```
