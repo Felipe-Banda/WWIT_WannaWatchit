@@ -53,16 +53,15 @@ O deploy foi realizado em uma instância **Amazon EC2 (t2.micro)**, utilizando o
 git clone [https://github.com/Felipe-Banda/WWIT_WannaWatchit.git](https://github.com/Felipe-Banda/WWIT_WannaWatchit.git)
 
 2. Acesse o diretório do projeto:
-```bash
 cd WWIT_WannaWatchit
 
 3. Suba os cointianers utilizando o Docker Compose:
-```bash
 dockercompose up -d --build
 
 4. Acesse a aplicação no seu navegador:
 * Frontend (Interface): http://localhost:8501
 * Backend (Documentação): http://localhost:8000/docs
+```
 
 ## 👨‍💻 Desenvolvedor
 Desenvolvido por Felipe Banda
