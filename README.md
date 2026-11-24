@@ -56,9 +56,9 @@ git clone [https://github.com/Felipe-Banda/WWIT_WannaWatchit.git](https://github
 ```bash
 cd WWIT_WannaWatchit
 ```
-3. Suba os cointianers utilizando o Docker Compose:
+3. Suba os containers utilizando o Docker Compose:
 ```bash
-dockercompose up -d --build
+docker compose up -d --build
 ```
 
 4. Acesse a aplicação no seu navegador:
