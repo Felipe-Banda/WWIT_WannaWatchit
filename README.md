@@ -4,6 +4,23 @@ Um sistema web completo para catalogação e gerenciamento de obras audiovisuais
 
 Este projeto foi construído para demonstrar habilidades Fullstack (Python) e práticas de DevOps, separando o frontend e o backend em contêineres independentes e orquestrados.
 
+## 🌐 Teste online
+
+O sistema está publicado e pode ser testado agora mesmo:
+
+- **Aplicação (Frontend):** http://13.58.103.151:8501/
+- **Documentação da API (Swagger):** http://13.58.103.151:8000/docs
+
+> ⚠️ **Atenção: ambiente público de demonstração**
+>
+> Para que qualquer pessoa possa explorar a área administrativa, a rota de registro de usuários (`POST /registro`) está **aberta intencionalmente**. Isso significa que:
+>
+> - Qualquer visitante pode criar uma conta e cadastrar, editar ou inativar obras.
+> - Os dados exibidos podem ter sido alterados por outros visitantes e podem ser modificados ou redefinidos a qualquer momento.
+> - **Não utilize senhas reais ou dados pessoais** ao criar sua conta de teste.
+>
+> Em um ambiente de produção, o registro seria restrito (por exemplo, apenas administradores criando novos usuários, ou contas novas sem permissão de administrador).
+
 ## 🚀 Funcionalidades
 
 O sistema possui controle de acesso com visões distintas para visitantes e administradores:
@@ -14,7 +31,7 @@ O sistema possui controle de acesso com visões distintas para visitantes e admi
 - Interface limpa e responsiva.
 
 **Visão Restrita (Administradores):**
-- Autenticação de usuário segura (JWT e Bcrypt).
+- Registro e autenticação de usuários com JWT e senhas protegidas com Bcrypt.
 - CRUD Completo: Cadastro, edição e inativação (soft delete) de obras.
 - Visualização de obras inativas ocultas do público.
 
@@ -36,7 +53,7 @@ O sistema possui controle de acesso com visões distintas para visitantes e admi
 
 ## ⚙️ Arquitetura e Deploy
 
-O projeto foi empacotado utilizando `docker-compose`, garantindo que os serviços conversem através de uma rede interna do Docker. 
+O projeto foi empacotado utilizando o Docker Compose (`docker-compose.yml`), garantindo que os serviços conversem através de uma rede interna do Docker.
 
 O deploy foi realizado em uma instância **Amazon EC2 (t2.micro)**, utilizando o sistema operacional Ubuntu. Volumes foram mapeados (`bind mounts`) para garantir a persistência do banco de dados SQLite mesmo após reinicializações do servidor.
 
@@ -50,7 +67,7 @@ O deploy foi realizado em uma instância **Amazon EC2 (t2.micro)**, utilizando o
 
 1. Clone este repositório:
 ```bash
-git clone [https://github.com/Felipe-Banda/WWIT_WannaWatchit.git](https://github.com/Felipe-Banda/WWIT_WannaWatchit.git)
+git clone https://github.com/Felipe-Banda/WWIT_WannaWatchit.git
 ```
 2. Acesse o diretório do projeto:
 ```bash
@@ -60,15 +77,11 @@ cd WWIT_WannaWatchit
 ```bash
 docker compose up -d --build
 ```
-
 4. Acesse a aplicação no seu navegador:
-```bash
-* Frontend (Interface): http://localhost:8501
-* Backend (Documentação): http://localhost:8000/docs
-```
+   - **Frontend (Interface):** http://localhost:8501
+   - **Backend (Documentação):** http://localhost:8000/docs
 
 ## 👨‍💻 Desenvolvedor
 Desenvolvido por Felipe Banda
-- [Linkedin](http://linkedin.com/in/felipe-banda)
-- [GitHub](http://github.com/felipe-banda)
-
+- [LinkedIn](https://linkedin.com/in/felipe-banda)
+- [GitHub](https://github.com/felipe-banda)
